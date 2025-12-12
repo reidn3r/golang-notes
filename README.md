@@ -164,10 +164,66 @@ delete(mapper, "key")
 
 ---
 
+
 ## 5. Slice (Reforço e Prática)
 
-- Exploração mais aprofundada dos slices.
-- Operações avançadas, como append, copy e slicing.
+Exploração mais aprofundada dos slices, operações avançadas e exemplos práticos.
+
+### Criação de Slices
+Você pode criar slices de diferentes formas:
+
+- A partir de um array:
+    ```go
+    arr := [5]int{1, 2, 3, 4, 5}
+    s := arr[1:4] // [2 3 4]
+    ```
+- Usando `make` para definir tamanho e capacidade:
+    ```go
+    s := make([]int, 0, 10) // slice vazio, capacidade 10
+    ```
+- Literal:
+    ```go
+    s := []int{1, 2, 3}
+    ```
+
+### Gerenciamento em Memória
+Um slice é apenas um header (ponteiro, tamanho, capacidade). O array subjacente só é alocado quando necessário (ex: ao usar `append`).
+
+### Consumo de Memória de um Slice Vazio
+Um slice vazio (`var s []int` ou `s := []int{}`) ocupa apenas o header (24 bytes em 64 bits). O array subjacente só é alocado quando elementos são inseridos.
+
+### Iteração e Acesso
+Você pode iterar sobre slices de várias formas:
+
+- Índice e valor:
+    ```go
+    for idx, val := range slice {
+            fmt.Printf("index: %d, valor: %d\n", idx, val)
+    }
+    ```
+- Apenas índice:
+    ```go
+    for i := range slice {
+            fmt.Println(i)
+    }
+    ```
+- Apenas valor:
+    ```go
+    for _, v := range slice {
+            fmt.Println(v)
+    }
+    ```
+
+### Acesso Fora do Limite
+Tentar acessar um índice fora do limite do slice causa panic em tempo de execução.
+
+### Valores Padrão
+Ao criar um slice de inteiros, todos os valores são inicializados com zero.
+
+### Resumo de Propriedades
+- Slices são dinâmicos e flexíveis.
+- O header do slice é leve, mas o array subjacente pode crescer conforme necessário.
+- Slices compartilham o array subjacente, então alterações em um slice podem afetar outros slices derivados do mesmo array.
 
 ---
 
