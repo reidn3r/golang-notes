@@ -1,21 +1,42 @@
+
 # Golang Notes
 
-Este repositório reúne exemplos e anotações dos principais conceitos e recursos da linguagem Go (Golang) que estudei até o momento. O objetivo é servir como referência rápida e prática sobre o aprendendizado, útil para revisar tópicos fundamentais da linguagem.
+Este repositório reúne exemplos e anotações dos principais conceitos e recursos da linguagem Go (Golang) que estudei até o momento. O objetivo é servir como referência rápida e prática sobre o aprendizado, útil para revisar tópicos fundamentais da linguagem.
 
-## Conteúdo Abordado
+---
 
-1. **Hello World**
-   - Primeiro contato com a linguagem Go, estrutura básica de um programa e execução do clássico "Hello, World!".
+## Índice
 
-### Funções Anônimas em Go
+1. [Hello World](#hello-world)
+2. [Funções Anônimas em Go](#funções-anônimas-em-go)
+3. [Arrays e Slices](#arrays-e-slices)
+   - [Diferença entre Array e Slice](#diferença-entre-array-e-slice)
+   - [O que é um Slice por baixo dos panos?](#o-que-é-um-slice-por-baixo-dos-panos)
+   - [Consumo de memória de um slice vazio](#consumo-de-memória-de-um-slice-vazio)
+   - [Como funciona o slice internamente?](#como-funciona-o-slice-internamente)
+4. [Maps](#maps-em-go-detalhes-e-funcionamento)
+5. [Slice (Reforço e Prática)](#slice-reforço-e-prática)
+6. [Defer e Panic](#defer-e-panic)
+7. [Estruturas de Dados](#estruturas-de-dados)
+8. [Design Patterns](#design-patterns)
 
-**Funções anônimas:** Funções sem nome atribuídas a uma variável ou executadas diretamente. Em Go, funções podem ser atribuídas a variáveis, passadas como argumento e retornadas de outras funções.
+---
+
+## 1. Hello World
+
+Primeiro contato com a linguagem Go, estrutura básica de um programa e execução do clássico "Hello, World!".
+
+---
+
+## 2. Funções Anônimas em Go
+
+Funções anônimas são funções sem nome atribuídas a uma variável ou executadas diretamente. Em Go, funções podem ser atribuídas a variáveis, passadas como argumento e retornadas de outras funções.
 
 **Exemplo:**
 
 ```go
 f := func(x, y int) int {
-   return x + y
+    return x + y
 }
 fmt.Println(f(2, 3)) // Saída: 5
 ```
@@ -24,15 +45,18 @@ Funções anônimas são úteis para lógica rápida, callbacks e closures (fun�
 
 ```go
 result := func(msg string) string {
-   return "Olá, " + msg
+    return "Olá, " + msg
 }("mundo")
 fmt.Println(result) // Saída: Olá, mundo
 ```
 
-2. **Arrays e Slices**
-   - Diferenças entre arrays e slices em Go.
-   - Como declarar, inicializar e manipular ambos.
-   - Vantagens dos slices e exemplos de uso prático.
+---
+
+## 3. Arrays e Slices
+
+- Diferenças entre arrays e slices em Go.
+- Como declarar, inicializar e manipular ambos.
+- Vantagens dos slices e exemplos de uso prático.
 
 ### Diferença entre Array e Slice
 
@@ -54,9 +78,9 @@ Um slice é uma estrutura composta por três campos:
 
 ```go
 type SliceHeader struct {
-      Data uintptr // ponteiro para o array
-      Len  int     // tamanho
-      Cap  int     // capacidade
+    Data uintptr // ponteiro para o array
+    Len  int     // tamanho
+    Cap  int     // capacidade
 }
 ```
 Esses campos podem ser acessados via o pacote `reflect`.
@@ -73,30 +97,102 @@ Quando você faz um slice de um array, o slice aponta para o array original, mas
 - Slices são leves, flexíveis e eficientes para manipulação de coleções.
 - Arrays são úteis quando o tamanho é fixo e conhecido em tempo de compilação.
 
-3. **Maps**
-   - Estrutura de dados do tipo dicionário (map).
-   - Criação, inserção, remoção e iteração de elementos.
-   - Casos de uso comuns.
+---
 
-4. **Slice (Reforço e Prática)**
-   - Exploração mais aprofundada dos slices.
-   - Operações avançadas, como append, copy e slicing.
+## 4. Maps em Go: Detalhes e Funcionamento
 
-5. **Defer e Panic**
-   - Uso do `defer` para adiar a execução de funções.
-   - Tratamento de erros com `panic` e recuperação com `recover`.
-   - Exemplos práticos de controle de fluxo e limpeza de recursos.
+O `map` em Go é uma estrutura de dados associativa (dicionário/hash table) que armazena pares chave-valor. É altamente eficiente para buscas, inserções e remoções.
 
-6. **Estruturas de Dados**
-   - Implementação de algumas estruturas clássicas:
-     - **List**: listas encadeadas e suas operações básicas.
-     - **Set**: conjuntos para garantir unicidade de elementos.
-     - **Tree**: árvores e exemplos de navegação.
+### Como criar um map
+```go
+mapper := make(map[string]int) // map vazio
+mapper["foo"] = 42            // inserção
+```
+Também é possível inicializar com valores:
+```go
+mapper := map[string]int{"a": 1, "b": 2}
+```
 
-7. **Design Patterns**
-   - Exemplos de padrões de projeto implementados em Go:
-     - **Builder**
-     - **Singleton**
-     - **Strategy**
+### Como funciona em memória
+Um map em Go é implementado como uma hash table. Internamente, ele mantém buckets (baldes) para distribuir as chaves de acordo com o hash. O map é um ponteiro para uma estrutura interna, e seu header ocupa 8 bytes em arquiteturas 64 bits. Um map vazio (`make(map[string]int)`) ocupa apenas o header, sem buckets alocados, até que um elemento seja inserido.
+
+### Consumo de memória de um map vazio
+Um map vazio ocupa cerca de 8 bytes (header) em 64 bits. Buckets e arrays internos só são alocados quando o primeiro elemento é inserido.
+
+### Iteração e acesso
+**Verificar existência:**
+```go
+val, exists := mapper["key"]
+if exists {
+    // chave encontrada, val contém o valor
+} else {
+    // chave não existe, val é o valor zero do tipo (ex: 0 para int, "" para string)
+}
+```
+
+**Apenas verificar existência:**
+```go
+_, exists := mapper["key"]
+```
+
+**Iterar sobre todos os elementos:**
+```go
+for key, value := range mapper {
+    fmt.Println(key, value)
+}
+```
+Ou apenas valores:
+```go
+for _, value := range mapper {
+    fmt.Println(value)
+}
+```
+
+### O que é retornado se a chave não existe?
+Ao acessar uma chave inexistente, o map retorna o valor zero do tipo do valor. Por exemplo, para `map[string]int`, retorna 0; para `map[string]string`, retorna "".
+
+### Remover elementos
+```go
+delete(mapper, "key")
+```
+
+### Resumo de propriedades
+- Busca, inserção e remoção são operações O(1) na média.
+- Não há garantia de ordem na iteração.
+- Maps não podem ser comparados (exceto com `nil`).
+- Maps são referências: ao passar para funções, não há cópia dos dados.
+
+---
+
+## 5. Slice (Reforço e Prática)
+
+- Exploração mais aprofundada dos slices.
+- Operações avançadas, como append, copy e slicing.
+
+---
+
+## 6. Defer e Panic
+
+- Uso do `defer` para adiar a execução de funções.
+- Tratamento de erros com `panic` e recuperação com `recover`.
+- Exemplos práticos de controle de fluxo e limpeza de recursos.
+
+---
+
+## 7. Estruturas de Dados
+
+- Implementação de algumas estruturas clássicas:
+  - **List**: listas encadeadas e suas operações básicas.
+  - **Set**: conjuntos para garantir unicidade de elementos.
+  - **Tree**: árvores e exemplos de navegação.
+
+---
+
+## 8. Design Patterns
+
+- Exemplos de padrões de projeto implementados em Go:
+  - **Builder**
+  - **Singleton**
+  - **Strategy**
 
 ---
